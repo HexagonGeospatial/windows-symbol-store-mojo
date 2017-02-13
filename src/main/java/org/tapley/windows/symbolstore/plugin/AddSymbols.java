@@ -1,8 +1,6 @@
 package org.tapley.windows.symbolstore.plugin;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.apache.maven.model.FileSet;
