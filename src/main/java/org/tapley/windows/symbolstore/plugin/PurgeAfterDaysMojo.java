@@ -44,12 +44,12 @@ public class PurgeAfterDaysMojo extends AbstractMojo {
         getLog().info("Path to repository: " + repositoryPath);
     }
     
-    private boolean validateDateForTransaction(TransactionEntry transactionEntry) {
+    public boolean validateDateForTransaction(TransactionEntry transactionEntry) {
         return transactionEntry.getInsertingTime().plusDays(days).isBefore(now);
     }
     
-    private long getDaysSinceTransactionAdded(TransactionEntry transactionEntry) {
-        return now.until(transactionEntry.getInsertingTime(), ChronoUnit.DAYS);
+    public long getDaysSinceTransactionAdded(TransactionEntry transactionEntry) {
+        return transactionEntry.getInsertingTime().until(now, ChronoUnit.DAYS);
     }
     
     
