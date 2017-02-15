@@ -45,6 +45,7 @@ public class TestPurgeAfterDays {
     int days = 7;
     File symStorePath = new File("c:\\debuggers\\symstore.exe");
     File repositoryPath = new File("c:\\bin\\x64\\release");
+    LocalDateTime now = LocalDateTime.now();
     
     @Before
     public void setUp() {
@@ -53,6 +54,8 @@ public class TestPurgeAfterDays {
         ReflectionTestUtils.setField(plugin, "symStorePath", symStorePath);
         ReflectionTestUtils.setField(plugin, "repositoryPath", repositoryPath);
         ReflectionTestUtils.setField(plugin, "days", days);
+        ReflectionTestUtils.setField(plugin, "now", now);
+        
     }
     
     @Test
@@ -116,7 +119,7 @@ public class TestPurgeAfterDays {
     @Test
     public void getDaysSinceTransactionAdded() {
         for(int i = 0; i < 14; i++) {
-            Mockito.when(entry.getInsertingTime()).thenReturn(LocalDateTime.now().minusDays(i+1));
+            Mockito.when(entry.getInsertingTime()).thenReturn(now.minusDays(i));
             long days = plugin.getDaysSinceTransactionAdded(entry);
             Assert.assertEquals(i, (int)days);
         }
