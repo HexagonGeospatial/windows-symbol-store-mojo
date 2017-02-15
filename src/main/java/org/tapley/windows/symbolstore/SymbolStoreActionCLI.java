@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 
 public class SymbolStoreActionCLI implements ISymbolStoreAction {
 
-    private List<String> getAddCommand(File symStorePath, File repositoryPath, String symbolsPath, String applicationName, String applicationVersion, String comment, boolean recursive, boolean compress, boolean verboseOutput) {
+    public List<String> getAddCommand(File symStorePath, File repositoryPath, String symbolsPath, String applicationName, String applicationVersion, String comment, boolean recursive, boolean compress, boolean verboseOutput) {
         List<String> commandList = new ArrayList<>();
         
         commandList.add("\"" + symStorePath.getAbsolutePath() + "\"");
