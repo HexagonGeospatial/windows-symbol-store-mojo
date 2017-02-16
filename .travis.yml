@@ -3,3 +3,5 @@ jdk:
  - oraclejdk8
 sudo: false
 script: mvn clean verify
+after_success:
+ - mvn clean cobertura:cobertura coveralls:report -Dcoveralls.repo.token=$repoToken

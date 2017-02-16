@@ -60,8 +60,8 @@ public class PurgeAfterDaysMojo extends AbstractMojo {
         
         try {
             List<TransactionEntry> transactions = symbolStoreAction.getActiveTransactionList(symStorePath, repositoryPath);
-            
-            transactions.stream().forEach((transactionEntry) -> {
+            for(TransactionEntry transactionEntry : transactions) {
+            //transactions.stream().forEach((transactionEntry) -> {
                 if(validateDateForTransaction(transactionEntry)) {
                     getLog().info(String.format("Transaction %s (Application %s) added %d days ago: PURGING",
                             transactionEntry.getTransactionId(),
@@ -81,7 +81,8 @@ public class PurgeAfterDaysMojo extends AbstractMojo {
                             transactionEntry.getApplicationName(), 
                             getDaysSinceTransactionAdded(transactionEntry)));
                 }
-            });
+            }
+            //});
         } catch(Exception ex) {
             throw new MojoExecutionException("Unable to process purge list", ex);
         }
