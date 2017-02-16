@@ -4,4 +4,4 @@ jdk:
 sudo: false
 script: mvn clean verify
 after_success:
- - mvn clean cobertura:cobertura coveralls:report -Dcoveralls.repo.token=$repoToken
+ - mvn cobertura:cobertura coveralls:report -Dcoveralls.repo.token=$repoToken
