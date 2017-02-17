@@ -2,8 +2,6 @@ package org.tapley.windows.symbolstore;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.commons.io.IOUtils;
 
 public class CommandRunner {
@@ -12,12 +10,13 @@ public class CommandRunner {
     int exitValue;
     Process process;
     String output;
+    Runtime runtime;
     
     CommandRunner(List<String> commandList) {
         if(commandList == null || commandList.isEmpty()) {
             throw new IllegalArgumentException("commandList cannot be null or empty");
         }
-        
+        this.runtime = Runtime.getRuntime();
         this.commandList = commandList;
         this.exitValue = 0xf0000000;
     }
@@ -26,7 +25,7 @@ public class CommandRunner {
         try {
             String[] commandArray = new String[commandList.size()];
             commandList.toArray(commandArray);
-            process = Runtime.getRuntime().exec(commandArray);
+            process = runtime.exec(commandArray);
             
             while(process.isAlive()) {
                 try {
