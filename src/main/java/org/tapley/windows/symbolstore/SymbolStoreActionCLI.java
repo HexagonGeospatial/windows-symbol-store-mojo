@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
+import org.codehaus.plexus.util.StringUtils;
 
 public class SymbolStoreActionCLI implements ISymbolStoreAction {
 
@@ -32,17 +33,17 @@ public class SymbolStoreActionCLI implements ISymbolStoreAction {
         commandList.add("/f");
         commandList.add(symbolsPath);
         
-        if(applicationName != null && !applicationName.isEmpty()) {
+        if(StringUtils.isNotEmpty(applicationName)) {
             commandList.add("/t");
             commandList.add(applicationName);
         }
         
-        if(applicationVersion != null && !applicationVersion.isEmpty()) {
+        if(StringUtils.isNotEmpty(applicationVersion)) {
             commandList.add("/v");
             commandList.add(applicationVersion);
         }
         
-        if(comment != null && !comment.isEmpty()) {
+        if(StringUtils.isNotEmpty(comment)) {
             commandList.add("/c");
             commandList.add(comment);
         }
