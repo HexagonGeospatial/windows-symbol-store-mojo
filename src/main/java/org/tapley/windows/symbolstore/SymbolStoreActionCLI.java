@@ -13,6 +13,8 @@ import org.codehaus.plexus.util.StringUtils;
 
 public class SymbolStoreActionCLI implements ISymbolStoreAction {
 
+    ICommandRunnerFactory commandRunnerFactory = new CommandRunnerFactory();
+    
     public List<String> getAddCommand(File symStorePath, File repositoryPath, String symbolsPath, String applicationName, String applicationVersion, String comment, boolean recursive, boolean compress, boolean verboseOutput) {
         List<String> commandList = new ArrayList<>();
         
@@ -67,7 +69,7 @@ public class SymbolStoreActionCLI implements ISymbolStoreAction {
     private List<String> getDeleteCommand(File symStorePath, File repositoryPath, String transactionId) {
         List<String> commandList = new ArrayList<>();
         
-        commandList.add(symStorePath.getAbsolutePath());
+        commandList.add("\"" + symStorePath.getAbsolutePath() + "\"");
         commandList.add("del");
         
         commandList.add("/i");
@@ -80,7 +82,7 @@ public class SymbolStoreActionCLI implements ISymbolStoreAction {
     }
     
     private String runCommand(List<String> commandList) {
-        CommandRunner runner = new CommandRunner(commandList);
+        CommandRunner runner = commandRunnerFactory.getCommandRunner(commandList);
         
         runner.run();
         

@@ -1,12 +1,19 @@
 package org.tapley.windows.symbolstore;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-
+import org.junit.rules.ExpectedException;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.springframework.test.util.ReflectionTestUtils;
 
 public class TestSymbolStoreActionCLI {
     
@@ -14,11 +21,22 @@ public class TestSymbolStoreActionCLI {
     File repositoryPath = new File("\\\\data1\\symbols");
     String symbolsPath = "*.dll";
     
+    @Mock
+    ICommandRunnerFactory commandRunnerFactory;
+    
+    @Mock
+    CommandRunner commandRunner;   
+    
+    @InjectMocks
     SymbolStoreActionCLI action;
+    
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
     
     @Before
     public void setUp() {
-        action = new SymbolStoreActionCLI();
+        MockitoAnnotations.initMocks(this);
+        ReflectionTestUtils.setField(action, "commandRunnerFactory", commandRunnerFactory);
     }
     
     @Test
@@ -94,4 +112,36 @@ public class TestSymbolStoreActionCLI {
         Assert.assertEquals("\"test\"", entry.getApplicationName());
         Assert.assertEquals("\"\"", entry.getComment());
     }
+    
+    @Test
+    public void runAddCommand() throws SymbolStoreException {
+        List<String> expectedCommand = new ArrayList<>();
+        expectedCommand.add("\"" + symStorePath.getAbsolutePath() + "\"");
+        expectedCommand.add("add");
+        expectedCommand.add("/r");
+        expectedCommand.add("/o");
+        expectedCommand.add("/s");
+        expectedCommand.add("\\\\data1\\symbols");
+        expectedCommand.add("/f");
+        expectedCommand.add("*.dll");
+        expectedCommand.add("/compress");
+        String expectedOutput = "output from command";
+        int expectedResponseCode = 0;
+        
+        Mockito.doNothing().when(commandRunner).run();
+        Mockito.when(commandRunner.getOutput()).thenReturn(expectedOutput);
+        Mockito.when(commandRunner.getExitValue()).thenReturn(expectedResponseCode);
+        Mockito.when(commandRunnerFactory.getCommandRunner(expectedCommand)).thenReturn(commandRunner);
+        
+        String actualOutput = action.addPath(symStorePath, repositoryPath, symbolsPath, null, null, null, true, true, true);
+        Assert.assertEquals(expectedOutput, actualOutput);
+    }
+    
+    @Test
+    public void runAddCommandThrows() throws SymbolStoreException {
+        thrown.expect(SymbolStoreException.class);
+        Mockito.when(commandRunnerFactory.getCommandRunner(Mockito.any())).thenThrow(new IllegalArgumentException("error"));
+        action.addPath(symStorePath, repositoryPath, symbolsPath, null, null, null, true, true, true);
+    }
+            
 }
