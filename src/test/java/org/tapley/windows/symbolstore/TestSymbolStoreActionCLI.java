@@ -115,23 +115,13 @@ public class TestSymbolStoreActionCLI {
     
     @Test
     public void runAddCommand() throws SymbolStoreException {
-        List<String> expectedCommand = new ArrayList<>();
-        expectedCommand.add("\"" + symStorePath.getAbsolutePath() + "\"");
-        expectedCommand.add("add");
-        expectedCommand.add("/r");
-        expectedCommand.add("/o");
-        expectedCommand.add("/s");
-        expectedCommand.add("\\\\data1\\symbols");
-        expectedCommand.add("/f");
-        expectedCommand.add("*.dll");
-        expectedCommand.add("/compress");
         String expectedOutput = "output from command";
         int expectedResponseCode = 0;
         
         Mockito.doNothing().when(commandRunner).run();
         Mockito.when(commandRunner.getOutput()).thenReturn(expectedOutput);
         Mockito.when(commandRunner.getExitValue()).thenReturn(expectedResponseCode);
-        Mockito.when(commandRunnerFactory.getCommandRunner(expectedCommand)).thenReturn(commandRunner);
+        Mockito.when(commandRunnerFactory.getCommandRunner(Mockito.any())).thenReturn(commandRunner);
         
         String actualOutput = action.addPath(symStorePath, repositoryPath, symbolsPath, null, null, null, true, true, true);
         Assert.assertEquals(expectedOutput, actualOutput);
