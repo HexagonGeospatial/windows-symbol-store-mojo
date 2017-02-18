@@ -1,17 +1,14 @@
 package org.tapley.windows.symbolstore;
 
-import java.util.regex.Matcher;
 import org.hamcrest.Description;
-import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
 import org.junit.Rule;
 import org.junit.internal.matchers.TypeSafeMatcher;
 import org.junit.rules.ExpectedException;
 
-public class SymbolStoreExceptionTest {
+public class TestSymbolStoreException {
     
-    public SymbolStoreExceptionTest() {
+    public TestSymbolStoreException() {
     }
     
     @Rule
