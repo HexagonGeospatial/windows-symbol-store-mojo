@@ -124,4 +124,19 @@ public class TestAddSymbols {
         
         plugin.execute();
     }
+    
+    @Test
+    public void nullFileSets() throws MojoExecutionException, MojoFailureException {
+        thrown.expect(MojoExecutionException.class);
+        ReflectionTestUtils.setField(plugin, "fileSets", null);
+        plugin.execute();
+    }
+    
+    @Test
+    public void emptyFileSets() throws MojoExecutionException, MojoFailureException {
+        thrown.expect(MojoExecutionException.class);
+        fileSetsArray = new FileSet[0];
+        ReflectionTestUtils.setField(plugin, "fileSets", fileSetsArray);
+        plugin.execute();
+    }
 }
