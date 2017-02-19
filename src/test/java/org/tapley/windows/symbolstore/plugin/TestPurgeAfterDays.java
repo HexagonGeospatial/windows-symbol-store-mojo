@@ -59,6 +59,14 @@ public class TestPurgeAfterDays {
     }
     
     @Test
+    public void failValidateDaysLessThanZero() throws MojoExecutionException, MojoFailureException {
+        thrown.expect(MojoExecutionException.class);
+        thrown.expectMessage("days cannot be less than zero");
+        ReflectionTestUtils.setField(plugin, "days", -1);
+        plugin.execute();
+    }
+    
+    @Test
     public void failValidateFile() throws MojoExecutionException, MojoFailureException {
         thrown.expect(MojoExecutionException.class);
         Mockito.doThrow(new MojoExecutionException("Bang!")).when(validationHelper).validateFile(Mockito.anyString(), Mockito.any(File.class));
@@ -102,6 +110,30 @@ public class TestPurgeAfterDays {
         Mockito.verify(symbolStoreAction, Mockito.times(1)).getActiveTransactionList(symStorePath, repositoryPath);
         Mockito.verify(symbolStoreAction, Mockito.times(1)).deleteTransaction(symStorePath, repositoryPath, transactionId);
         Mockito.verifyNoMoreInteractions(symbolStoreAction);
+    }
+    
+    @Test
+    public void transactionNeedsPurgeDeleteThrows() throws SymbolStoreException, MojoExecutionException, MojoFailureException {
+        List<TransactionEntry> transactions = new ArrayList<>();
+        Mockito.when(entry.getInsertingTime()).thenReturn(LocalDateTime.now().minusDays(days+2));
+        String transactionId = "id";
+        Mockito.when(entry.getTransactionId()).thenReturn(transactionId);
+        transactions.add(entry);
+        Mockito.when(symbolStoreAction.getActiveTransactionList(symStorePath, repositoryPath)).thenReturn(transactions);
+        Mockito.when(symbolStoreAction.deleteTransaction(symStorePath, repositoryPath, transactionId)).thenThrow(new SymbolStoreException("error"));
+        
+        plugin.execute();
+        
+        Mockito.verify(symbolStoreAction, Mockito.times(1)).getActiveTransactionList(symStorePath, repositoryPath);
+        Mockito.verify(symbolStoreAction, Mockito.times(1)).deleteTransaction(symStorePath, repositoryPath, transactionId);
+        Mockito.verifyNoMoreInteractions(symbolStoreAction);
+    }
+    
+    @Test
+    public void transactionListThrows() throws SymbolStoreException, MojoExecutionException, MojoFailureException {
+        thrown.expect(MojoExecutionException.class);        
+        Mockito.when(symbolStoreAction.getActiveTransactionList(symStorePath, repositoryPath)).thenThrow(new SymbolStoreException("error"));
+        plugin.execute();
     }
     
     @Test
