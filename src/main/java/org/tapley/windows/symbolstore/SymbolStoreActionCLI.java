@@ -1,19 +1,25 @@
 package org.tapley.windows.symbolstore;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
 import org.codehaus.plexus.util.StringUtils;
 
 public class SymbolStoreActionCLI implements ISymbolStoreAction {
 
     ICommandRunnerFactory commandRunnerFactory = new CommandRunnerFactory();
+    IFileUtil fileUtil = new FileUtil();
     
     public List<String> getAddCommand(File symStorePath, File repositoryPath, String symbolsPath, String applicationName, String applicationVersion, String comment, boolean recursive, boolean compress, boolean verboseOutput) {
         List<String> commandList = new ArrayList<>();
@@ -126,15 +132,17 @@ public class SymbolStoreActionCLI implements ISymbolStoreAction {
             List<TransactionEntry> transactionEntries = new ArrayList<>();
             File serverTxt = getServerListPath(repositoryPath);
            
-            try (Stream<String> stream = Files.lines(Paths.get(serverTxt.getAbsolutePath()))) {
-                while(stream.iterator().hasNext()) {
-                    String line = stream.iterator().next();
-                    List<String> items = Arrays.asList(line.split("\\s*,\\s*"));
-                    if(items != null && items.size() == 8) {
-                        transactionEntries.add(constructFromStringList(items));
+            fileUtil.getLinesFromFile(serverTxt.getAbsolutePath()).forEach(new Consumer<String>() {
+                @Override
+                public void accept(String line) {
+                    if(!line.trim().isEmpty()) {
+                        List<String> items = Arrays.asList(line.split("\\s*,\\s*"));
+                        if(items != null && items.size() == 8) {
+                            transactionEntries.add(constructFromStringList(items));
+                        }
                     }
                 }
-            }
+            });
             return transactionEntries;
         } catch(Exception ex) {
             throw new SymbolStoreException(String.format("Unable to parse transaction list from symbol path %s", symStorePath), ex);
