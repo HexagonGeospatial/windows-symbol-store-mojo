@@ -96,7 +96,6 @@
 					<version>2.7</version>
 					<configuration>
 						<format>xml</format>
-						<format>html</format>
 						<aggregate>true</aggregate>
 						<maxmem>256m</maxmem>
 					</configuration>

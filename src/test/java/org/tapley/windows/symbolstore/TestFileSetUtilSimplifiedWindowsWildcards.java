@@ -60,6 +60,20 @@ public class TestFileSetUtilSimplifiedWindowsWildcards {
     }
     
     @Test
+    public void starDotStarRecursiveButNotReallyAFile() {
+        thrown.expect(IllegalStateException.class);
+        fileSet.addInclude("**/*.dll/trickedyou");
+        fileSetUtil.getSimplifiedWindowsWildcards(fileSet);
+    }
+    
+    @Test
+    public void starDotStarRecursiveButNotReallyAFile2() {
+        thrown.expect(IllegalStateException.class);
+        fileSet.addInclude("**/*./");
+        fileSetUtil.getSimplifiedWindowsWildcards(fileSet);
+    }
+    
+    @Test
     public void starDotStarNotRecursive() {
         fileSet.addInclude("*.*");
         List<WildCardPath> path = fileSetUtil.getSimplifiedWindowsWildcards(fileSet);
