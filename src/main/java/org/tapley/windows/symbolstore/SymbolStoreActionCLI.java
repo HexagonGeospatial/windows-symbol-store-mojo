@@ -125,15 +125,13 @@ public class SymbolStoreActionCLI implements ISymbolStoreAction {
         try {
             List<TransactionEntry> transactionEntries = new ArrayList<>();
             File serverTxt = getServerListPath(repositoryPath);
-            
-            if(serverTxt.exists()) {
-                try (Stream<String> stream = Files.lines(Paths.get(serverTxt.getAbsolutePath()))) {
-                    while(stream.iterator().hasNext()) {
-                        String line = stream.iterator().next();
-                        List<String> items = Arrays.asList(line.split("\\s*,\\s*"));
-                        if(items != null && items.size() == 8) {
-                            transactionEntries.add(constructFromStringList(items));
-                        }
+           
+            try (Stream<String> stream = Files.lines(Paths.get(serverTxt.getAbsolutePath()))) {
+                while(stream.iterator().hasNext()) {
+                    String line = stream.iterator().next();
+                    List<String> items = Arrays.asList(line.split("\\s*,\\s*"));
+                    if(items != null && items.size() == 8) {
+                        transactionEntries.add(constructFromStringList(items));
                     }
                 }
             }
