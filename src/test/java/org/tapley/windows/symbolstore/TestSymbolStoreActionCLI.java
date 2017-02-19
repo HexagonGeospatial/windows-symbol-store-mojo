@@ -110,6 +110,7 @@ public class TestSymbolStoreActionCLI {
         Assert.assertEquals(43, entry.getInsertingTime().getMinute());
         Assert.assertEquals(28, entry.getInsertingTime().getSecond());
         Assert.assertEquals("\"test\"", entry.getApplicationName());
+        Assert.assertEquals("\"\"", entry.getApplicationVersion());
         Assert.assertEquals("\"\"", entry.getComment());
     }
     
