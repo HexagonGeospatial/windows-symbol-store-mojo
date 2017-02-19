@@ -66,7 +66,7 @@ public class SymbolStoreActionCLI implements ISymbolStoreAction {
         }
     }
 
-    private List<String> getDeleteCommand(File symStorePath, File repositoryPath, String transactionId) {
+    public List<String> getDeleteCommand(File symStorePath, File repositoryPath, String transactionId) {
         List<String> commandList = new ArrayList<>();
         
         commandList.add("\"" + symStorePath.getAbsolutePath() + "\"");

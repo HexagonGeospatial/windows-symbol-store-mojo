@@ -133,5 +133,64 @@ public class TestSymbolStoreActionCLI {
         Mockito.when(commandRunnerFactory.getCommandRunner(Mockito.any())).thenThrow(new IllegalArgumentException("error"));
         action.addPath(symStorePath, repositoryPath, symbolsPath, null, null, null, true, true, true);
     }
-            
+    
+    @Test
+    public void runAddCommandBadExitValue() throws SymbolStoreException {
+        thrown.expect(SymbolStoreException.class);
+        int expectedResponseCode = 1;
+        
+        Mockito.doNothing().when(commandRunner).run();
+        Mockito.when(commandRunner.getExitValue()).thenReturn(expectedResponseCode);
+        Mockito.when(commandRunnerFactory.getCommandRunner(Mockito.any())).thenReturn(commandRunner);
+        
+        action.addPath(symStorePath, repositoryPath, symbolsPath, null, null, null, true, true, true);
+    }
+    
+    @Test
+    public void deleteCommand() {
+        String transactionId = "00000001";
+        List<String> expectedDeleteCommand = new ArrayList<>();
+        expectedDeleteCommand.add("\"" + symStorePath.getAbsolutePath() + "\"");
+        expectedDeleteCommand.add("del");
+        expectedDeleteCommand.add("/i");
+        expectedDeleteCommand.add(transactionId);
+        expectedDeleteCommand.add("/s");
+        expectedDeleteCommand.add(repositoryPath.getAbsolutePath());
+        
+        List<String> actualDeleteCommand = action.getDeleteCommand(symStorePath, repositoryPath, transactionId);
+        Assert.assertArrayEquals(expectedDeleteCommand.toArray(), actualDeleteCommand.toArray());
+    }
+    
+    @Test
+    public void runDeleteCommand() throws SymbolStoreException {
+        String expectedOutput = "output from command";
+        int expectedResponseCode = 0;
+        
+        Mockito.doNothing().when(commandRunner).run();
+        Mockito.when(commandRunner.getOutput()).thenReturn(expectedOutput);
+        Mockito.when(commandRunner.getExitValue()).thenReturn(expectedResponseCode);
+        Mockito.when(commandRunnerFactory.getCommandRunner(Mockito.any())).thenReturn(commandRunner);
+        
+        String actualOutput = action.deleteTransaction(symStorePath, repositoryPath, "0000001");
+        Assert.assertEquals(expectedOutput, actualOutput);
+    }
+    
+    @Test
+    public void runDeleteCommandThrows() throws SymbolStoreException {
+        thrown.expect(SymbolStoreException.class);
+        Mockito.when(commandRunnerFactory.getCommandRunner(Mockito.any())).thenThrow(new IllegalArgumentException("error"));
+        action.deleteTransaction(symStorePath, repositoryPath, "000001");
+    }
+    
+    @Test
+    public void runDeleteCommandBadExitValue() throws SymbolStoreException {
+        thrown.expect(SymbolStoreException.class);
+        int expectedResponseCode = 1;
+        
+        Mockito.doNothing().when(commandRunner).run();
+        Mockito.when(commandRunner.getExitValue()).thenReturn(expectedResponseCode);
+        Mockito.when(commandRunnerFactory.getCommandRunner(Mockito.any())).thenReturn(commandRunner);
+        
+        action.deleteTransaction(symStorePath, repositoryPath, "000001");
+    }
 }
