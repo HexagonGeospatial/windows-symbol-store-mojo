@@ -98,6 +98,22 @@ public class TestAddSymbols {
     }
     
     @Test
+    public void getSimplifiedWindowsWildcardsFailsThenAddThrows() throws IOException, MojoExecutionException, MojoFailureException, SymbolStoreException {
+        
+        List<File> files = new ArrayList<>();
+        files.add(new File("C:\\temp\\file.dll"));
+        
+        Mockito.when(fileSetUtil.getSimplifiedWindowsWildcards(fileSet)).thenThrow(new IllegalStateException("unsupported"));
+        Mockito.when(fileSetUtil.toFileList(fileSet)).thenReturn(files);
+        Mockito.when(symbolStoreAction.addPath(symStorePath, repositoryPath, files.get(0).getAbsolutePath(), applicationName, applicationVersion, comment, false, false, false)).thenThrow(new SymbolStoreException("error"));
+        plugin.execute();
+        
+        Mockito.verify(fileSetUtil).getSimplifiedWindowsWildcards(fileSet);
+        Mockito.verify(fileSetUtil).toFileList(fileSet);
+        Mockito.verify(symbolStoreAction).addPath(symStorePath, repositoryPath, files.get(0).getAbsolutePath(), applicationName, applicationVersion, comment, false, false, false);
+    }
+    
+    @Test
     public void getSimplifiedWindowsWildcards() throws IOException, MojoExecutionException, MojoFailureException, SymbolStoreException {
         
         List<WildCardPath> files = new ArrayList<>();
@@ -109,6 +125,18 @@ public class TestAddSymbols {
         
         Mockito.verify(fileSetUtil).getSimplifiedWindowsWildcards(fileSet);
         Mockito.verify(symbolStoreAction).addPath(symStorePath, repositoryPath, files.get(0).getPath(), applicationName, applicationVersion, comment, files.get(0).isRecursive(), false, false);
+    }
+    
+    @Test
+    public void getSimplifiedAddFilesThrows() throws IOException, MojoExecutionException, MojoFailureException, SymbolStoreException {
+        
+        List<WildCardPath> files = new ArrayList<>();
+        files.add(new WildCardPath("C:\\temp\\*.dll", true));
+        
+        Mockito.when(fileSetUtil.getSimplifiedWindowsWildcards(fileSet)).thenReturn(files);
+        Mockito.doThrow(new SymbolStoreException("bang")).when(symbolStoreAction).addPath(symStorePath, repositoryPath, files.get(0).getPath(), applicationName, applicationVersion, comment, files.get(0).isRecursive(), false, false);
+        
+        plugin.execute();
     }
     
     @Test
