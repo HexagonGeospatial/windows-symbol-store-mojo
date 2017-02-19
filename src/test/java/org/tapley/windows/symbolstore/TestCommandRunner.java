@@ -58,10 +58,11 @@ public class TestCommandRunner {
     }
     
     @Test
-    public void generalUsage() throws IOException {
+    public void generalUsage() throws IOException, InterruptedException {
         ReflectionTestUtils.setField(runner, "runtime", runtime);
         Mockito.when(runtime.exec(Mockito.any(String[].class))).thenAnswer(new Answer<Process>() {
             
+            @Override
             public Process answer(InvocationOnMock invocation) throws Throwable {
                 String[] commandArray = invocation.getArgumentAt(0, String[].class);
                 Assert.assertEquals(commandList.size(), commandArray.length);
@@ -72,13 +73,25 @@ public class TestCommandRunner {
             }
         });
         Mockito.when(process.isAlive()).thenAnswer(new Answer<Boolean>() {
-            boolean nextResponse = true;
+            boolean firstTime = true;
+            @Override
             public Boolean answer(InvocationOnMock invocation) throws Throwable {
-                if(nextResponse) {
-                    nextResponse = false;
+                if(firstTime) {
+                    firstTime = false;
                     return true;
                 }
-                return nextResponse;
+                return false;
+            }
+        });
+        Mockito.when(process.waitFor()).thenAnswer(new Answer<Boolean>() {
+            boolean firstTime = true;
+            @Override
+            public Boolean answer(InvocationOnMock invocation) throws Throwable {
+                if(firstTime) {
+                    firstTime = false;
+                    throw new InterruptedException("interrupted");
+                }
+                return false;
             }
         });
         String outputExpected = "the command output";
