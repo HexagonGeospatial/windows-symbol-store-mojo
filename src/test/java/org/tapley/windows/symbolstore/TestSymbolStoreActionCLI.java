@@ -166,6 +166,7 @@ public class TestSymbolStoreActionCLI {
         expectedDeleteCommand.add(transactionId);
         expectedDeleteCommand.add("/s");
         expectedDeleteCommand.add(repositoryPath.getAbsolutePath());
+        expectedDeleteCommand.add("/o");
         
         List<String> actualDeleteCommand = action.getDeleteCommand(symStorePath, repositoryPath, transactionId);
         Assert.assertArrayEquals(expectedDeleteCommand.toArray(), actualDeleteCommand.toArray());

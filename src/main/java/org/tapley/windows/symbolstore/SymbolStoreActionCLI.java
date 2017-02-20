@@ -84,6 +84,8 @@ public class SymbolStoreActionCLI implements ISymbolStoreAction {
         commandList.add("/s");
         commandList.add(repositoryPath.getAbsolutePath());
         
+        commandList.add("/o");
+        
         return commandList;
     }
     
@@ -132,17 +134,19 @@ public class SymbolStoreActionCLI implements ISymbolStoreAction {
             List<TransactionEntry> transactionEntries = new ArrayList<>();
             File serverTxt = getServerListPath(repositoryPath);
            
-            fileUtil.getLinesFromFile(serverTxt.getAbsolutePath()).forEach(new Consumer<String>() {
-                @Override
-                public void accept(String line) {
-                    if(!line.trim().isEmpty()) {
-                        List<String> items = Arrays.asList(line.split("\\s*,\\s*"));
-                        if(items != null && items.size() == 8) {
-                            transactionEntries.add(constructFromStringList(items));
+            try (Stream<String> lines = fileUtil.getLinesFromFile(serverTxt.getAbsolutePath())) {
+                lines.forEach(new Consumer<String>() {
+                    @Override
+                    public void accept(String line) {
+                        if(!line.trim().isEmpty()) {
+                            List<String> items = Arrays.asList(line.split("\\s*,\\s*"));
+                            if(items != null && items.size() == 8) {
+                                transactionEntries.add(constructFromStringList(items));
+                            }
                         }
                     }
-                }
-            });
+                });
+            }
             return transactionEntries;
         } catch(Exception ex) {
             throw new SymbolStoreException(String.format("Unable to parse transaction list from symbol path %s", symStorePath), ex);
