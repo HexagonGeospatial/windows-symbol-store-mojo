@@ -23,6 +23,9 @@ Obviously, this plugin will only work on Windows.
 ## Examples
 
 ### Add Files
+
+Files are defined by filesets.  It is best to keep the filesets simple so that it can easily translate into a windows wildcard.  This limits the number of discrete transactions.
+
 ```xml
 <plugin>
 	<groupId>org.tapley</groupId>
@@ -36,7 +39,7 @@ Obviously, this plugin will only work on Windows.
 			<fileSet>
 				<directory>C:\Temp\binaries</directory>   
 				<includes>
-					<include>*.dll</include>
+					<include>**/*.dll</include>
 				</includes>
 			</fileSet>
 		</fileSets>
@@ -47,6 +50,32 @@ Obviously, this plugin will only work on Windows.
 			<phase>process-sources</phase>
 			<goals>
 				<goal>AddSymbols</goal>
+			</goals>
+		</execution>
+	</executions>
+</plugin>
+```
+
+### Purge transactions after so many days
+
+You might have multiple symbol stores, one for your released builds and one for your continuous integration builds.  You may not want to keep your continuous integration symbols forever so this mojo will delete them after a configurable number of days.
+
+```xml
+<plugin>
+	<groupId>org.tapley</groupId>
+	<artifactId>windows-symbol-store</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<configuration>
+		<symStorePath>C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\symstore.exe</symStorePath>
+		<repositoryPath>C:\temp\symbols</repositoryPath>
+		<days>60</days>
+	</configuration>
+	<executions>
+		<execution>
+			<id>mojo-test</id>
+			<phase>process-classes</phase>
+			<goals>
+				<goal>PurgeAfterDays</goal>
 			</goals>
 		</execution>
 	</executions>
