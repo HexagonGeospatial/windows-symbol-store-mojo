@@ -89,21 +89,21 @@ public class TestSymbolStoreActionCLI {
     public void getAddCommandApplicationName() {
         String expectedApplicationName = "MyApp";
         List<String> command = action.getAddCommand(symStorePath, repositoryPath, symbolsPath, expectedApplicationName, null, null, false, false, false);
-        Assert.assertEquals(expectedApplicationName, command.get(command.indexOf("/t") + 1));
+        Assert.assertEquals("\"" + expectedApplicationName + "\"", command.get(command.indexOf("/t") + 1));
     }
     
     @Test
     public void getAddCommandComment() {
         String expectedComment = "my symbols";
         List<String> command = action.getAddCommand(symStorePath, repositoryPath, symbolsPath, null, null, expectedComment, false, false, false);
-        Assert.assertEquals(expectedComment, command.get(command.indexOf("/c") + 1));
+        Assert.assertEquals("\"" + expectedComment + "\"", command.get(command.indexOf("/c") + 1));
     }
     
     @Test
     public void getAddCommandApplicationVersion() {
         String expectedApplicationVersion = "1.0";
         List<String> command = action.getAddCommand(symStorePath, repositoryPath, symbolsPath, null, expectedApplicationVersion, null, false, false, false);
-        Assert.assertEquals(expectedApplicationVersion, command.get(command.indexOf("/v") + 1));
+        Assert.assertEquals("\"" + expectedApplicationVersion + "\"", command.get(command.indexOf("/v") + 1));
     }
 
     @Test
@@ -165,7 +165,7 @@ public class TestSymbolStoreActionCLI {
         expectedDeleteCommand.add("/i");
         expectedDeleteCommand.add(transactionId);
         expectedDeleteCommand.add("/s");
-        expectedDeleteCommand.add(repositoryPath.getAbsolutePath());
+        expectedDeleteCommand.add("\"" + repositoryPath.getAbsolutePath() + "\"");
         expectedDeleteCommand.add("/o");
         
         List<String> actualDeleteCommand = action.getDeleteCommand(symStorePath, repositoryPath, transactionId);

@@ -1,30 +1,48 @@
 package org.tapley.windows.symbolstore;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Stream;
 import org.codehaus.plexus.util.StringUtils;
 
+/**
+ * The symstore.exe wrapper class
+ * 
+ * @author Chris
+ */
 public class SymbolStoreActionCLI implements ISymbolStoreAction {
 
     ICommandRunnerFactory commandRunnerFactory = new CommandRunnerFactory();
     IFileUtil fileUtil = new FileUtil();
     
+    private String wrapStringInQuotes(String path) {
+        return "\"" + path + "\"";
+    }
+    
+    /**
+     * Gets an add command from input arguments
+     * 
+     * @param symStorePath The path to symstore.exe
+     * @param repositoryPath The path to the target repository
+     * @param symbolsPath The path to the symbols to be added to the repository
+     * @param applicationName The application name to store for this transaction
+     * @param applicationVersion The application version to store for this transaction
+     * @param comment The comment to store for this version (optional)
+     * @param recursive Should the search for symbols at symbolsPath be recursive
+     * @param compress Should the stored symbols be compressed
+     * @param verboseOutput Do you want verbose output from the symstore.exe invokation
+     * 
+     * @return symstore add command as a list of strings
+     */
     public List<String> getAddCommand(File symStorePath, File repositoryPath, String symbolsPath, String applicationName, String applicationVersion, String comment, boolean recursive, boolean compress, boolean verboseOutput) {
         List<String> commandList = new ArrayList<>();
         
-        commandList.add("\"" + symStorePath.getAbsolutePath() + "\"");
+        commandList.add(wrapStringInQuotes(symStorePath.getAbsolutePath()));
         commandList.add("add");
         
         if(recursive) {
@@ -36,24 +54,24 @@ public class SymbolStoreActionCLI implements ISymbolStoreAction {
         }
         
         commandList.add("/s");
-        commandList.add(repositoryPath.getAbsolutePath());
+        commandList.add(wrapStringInQuotes(repositoryPath.getAbsolutePath()));
         
         commandList.add("/f");
-        commandList.add(symbolsPath);
+        commandList.add(wrapStringInQuotes(symbolsPath));
         
         if(StringUtils.isNotEmpty(applicationName)) {
             commandList.add("/t");
-            commandList.add(applicationName);
+            commandList.add(wrapStringInQuotes(applicationName));
         }
         
         if(StringUtils.isNotEmpty(applicationVersion)) {
             commandList.add("/v");
-            commandList.add(applicationVersion);
+            commandList.add(wrapStringInQuotes(applicationVersion));
         }
         
         if(StringUtils.isNotEmpty(comment)) {
             commandList.add("/c");
-            commandList.add(comment);
+            commandList.add(wrapStringInQuotes(comment));
         }
         
         if(compress) {
@@ -63,6 +81,21 @@ public class SymbolStoreActionCLI implements ISymbolStoreAction {
         return commandList;
     }
     
+    /**
+     * Add symbols from symbolsPath to the symstore repository
+     * 
+     * @param symStorePath The path to symstore.exe
+     * @param repositoryPath The path to the target repository
+     * @param symbolsPath The path to the symbols to be added to the repository
+     * @param applicationName The application name to store for this transaction
+     * @param applicationVersion The application version to store for this transaction
+     * @param comment The comment to store for this version (optional)
+     * @param recursive Should the search for symbols at symbolsPath be recursive
+     * @param compress Should the stored symbols be compressed
+     * @param verboseOutput Do you want verbose output from the symstore.exe invokation
+     * @return The output from the symstore.exe invokation
+     * @throws SymbolStoreException When something went wrong
+     */
     @Override
     public String addPath(File symStorePath, File repositoryPath, String symbolsPath, String applicationName, String applicationVersion, String comment, boolean recursive, boolean compress, boolean verboseOutput) throws SymbolStoreException {
         try {
@@ -72,17 +105,25 @@ public class SymbolStoreActionCLI implements ISymbolStoreAction {
         }
     }
 
+    /**
+     * Get the delete command to delete a transaction from the symbol server
+     * 
+     * @param symStorePath The path to symstore.exe
+     * @param repositoryPath The path to the target repository
+     * @param transactionId The id of the transaction to delete
+     * @return the symstore.exe command to delete the transaction
+     */
     public List<String> getDeleteCommand(File symStorePath, File repositoryPath, String transactionId) {
         List<String> commandList = new ArrayList<>();
         
-        commandList.add("\"" + symStorePath.getAbsolutePath() + "\"");
+        commandList.add(wrapStringInQuotes(symStorePath.getAbsolutePath()));
         commandList.add("del");
         
         commandList.add("/i");
         commandList.add(transactionId);
         
         commandList.add("/s");
-        commandList.add(repositoryPath.getAbsolutePath());
+        commandList.add(wrapStringInQuotes(repositoryPath.getAbsolutePath()));
         
         commandList.add("/o");
         
@@ -101,6 +142,15 @@ public class SymbolStoreActionCLI implements ISymbolStoreAction {
         return runner.getOutput();
     }
     
+    /**
+     * Delete a transaction from the symbol server
+     * 
+     * @param symStorePath The path to symstore.exe
+     * @param repositoryPath The path to the target repository
+     * @param transactionId The id of the transaction to delete
+     * @return The output from the symstore.exe command
+     * @throws SymbolStoreException When something went wrong
+     */
     @Override
     public String deleteTransaction(File symStorePath, File repositoryPath, String transactionId) throws SymbolStoreException {
         try {
@@ -114,6 +164,12 @@ public class SymbolStoreActionCLI implements ISymbolStoreAction {
         return new File(repositoryPath + File.separator + "000Admin", "server.txt");
     }
     
+    /**
+     * Parses a TransactionEntry from a symstore transaction
+     * 
+     * @param items Transaction parts
+     * @return parsed TransactionEntry
+     */
     public TransactionEntry constructFromStringList(List<String> items) {
         TransactionEntry entry = new TransactionEntry();
         entry.setTransactionId(items.get(0));
@@ -128,6 +184,14 @@ public class SymbolStoreActionCLI implements ISymbolStoreAction {
         return entry;
     }
     
+    /**
+     * Gets the list of active transactions on the server
+     * 
+     * @param symStorePath The path to symstore.exe
+     * @param repositoryPath The path to the target repository
+     * @return The list of parsed transactions
+     * @throws SymbolStoreException When something went wrong
+     */
     @Override
     public List<TransactionEntry> getActiveTransactionList(File symStorePath, File repositoryPath) throws SymbolStoreException {
         try {
