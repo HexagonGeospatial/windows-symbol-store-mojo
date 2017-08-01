@@ -3,6 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.christapley</groupId>
 	<artifactId>windows-symbol-store-maven-plugin</artifactId>
+	<version>1.0.1</version>
 	<packaging>maven-plugin</packaging>
 	<url>https://github.com/christapley/windows-symbol-store-mojo</url>
 	<name>${project.groupId}:${project.artifactId}</name>
