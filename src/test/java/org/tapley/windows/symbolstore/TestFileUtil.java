@@ -17,5 +17,4 @@ public class TestFileUtil {
         thrown.expect(IOException.class);
         fileUtil.getLinesFromFile("path/does\\not///////exist");
     }
-    
 }

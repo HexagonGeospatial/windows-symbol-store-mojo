@@ -21,9 +21,19 @@ public class FileSetUtil implements IFileSetUtil {
     
     @Override
     public List<WildCardPath> getSimplifiedWindowsWildcards(FileSet fileSet) {
+        
+        if(fileSet == null) {
+            throw new IllegalArgumentException("fileSet cannot be null");
+        }
+        
         List<WildCardPath> windowsWildCards = new ArrayList<>();
 
-        String directory = fileSet.getDirectory().replace('/', '\\');
+        String directory = fileSet.getDirectory();
+        if(directory == null) {
+            directory = ".";
+        } else {
+            directory = directory.replace('/', '\\');
+        }
 
         if (fileSet.getExcludes() != null && !fileSet.getExcludes().isEmpty()) {
             throw new IllegalStateException(FILESET_NOT_SUPPORTED);

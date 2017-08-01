@@ -36,6 +36,21 @@ public class TestFileSetUtilSimplifiedWindowsWildcards {
     }
     
     @Test
+    public void nullFileset() {
+        thrown.expect(IllegalArgumentException.class);
+        fileSetUtil.getSimplifiedWindowsWildcards(null);
+    }
+    
+    @Test
+    public void nullDirectory() {
+        fileSet.setDirectory(null);
+        fileSet.addInclude("file.dll");
+        List<WildCardPath> path = fileSetUtil.getSimplifiedWindowsWildcards(fileSet);
+        Assert.assertEquals(1, path.size());
+        Assert.assertEquals(".\\file.dll", path.get(0).getPath());
+    }
+    
+    @Test
     public void noIncludes() {
         thrown.expect(IllegalStateException.class);
         thrown.expectMessage(EXPECTED_FILESET_NOT_SUPPORTED);

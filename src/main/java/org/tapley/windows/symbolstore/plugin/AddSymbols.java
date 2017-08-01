@@ -75,6 +75,7 @@ public class AddSymbols  extends AbstractMojo {
                 if(wildCards != null) {
                     for(WildCardPath path : wildCards) {
                         try {
+                            getLog().info("Storing symbols in path " + path.getPath());
                             symbolStoreAction.addPath(symStorePath, repositoryPath, path.getPath(), applicationName, applicationVersion, comment, path.isRecursive(), compress, false);
                         } catch (SymbolStoreException ex) {
                             getLog().warn(ex);
@@ -83,6 +84,7 @@ public class AddSymbols  extends AbstractMojo {
                 } else {
                     for(File file : fileSetUtil.toFileList(fileSet)) {
                         try {
+                            getLog().debug("Storing file " + file.getAbsolutePath());
                             symbolStoreAction.addPath(symStorePath, repositoryPath, file.getAbsolutePath(), applicationName, applicationVersion, comment, false, compress, false);
                         } catch (SymbolStoreException ex) {
                             getLog().warn(ex);
